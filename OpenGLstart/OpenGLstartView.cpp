@@ -22,6 +22,9 @@
 IMPLEMENT_DYNCREATE(COpenGLstartView, CView)
 
 BEGIN_MESSAGE_MAP(COpenGLstartView, CView)
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // COpenGLstartView construction/destruction
@@ -79,3 +82,30 @@ COpenGLstartDoc* COpenGLstartView::GetDocument() const // non-debug version is i
 
 
 // COpenGLstartView message handlers
+
+
+int COpenGLstartView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  Add your specialized creation code here
+
+	return 0;
+}
+
+
+void COpenGLstartView::OnDestroy()
+{
+	CView::OnDestroy();
+
+	// TODO: Add your message handler code here
+}
+
+
+void COpenGLstartView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+}
