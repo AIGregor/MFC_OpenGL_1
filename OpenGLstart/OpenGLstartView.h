@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 class COpenGLstartView : public CView
 {
 protected: // create from serialization only
@@ -32,7 +31,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:
+private:
+
+	static const char* const _ErrorStrings[];
+	const char* m_ErrorString;
+
+private:
+	HGLRC m_hglrc;
 
 // Generated message map functions
 protected:

@@ -12,9 +12,14 @@
 #include "OpenGLstartDoc.h"
 #include "OpenGLstartView.h"
 
+#pragma comment(lib,"opengl32.lib")
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#include "GL\gl.h"
+#include "GL\glu.h"
 
 
 // COpenGLstartView
@@ -28,11 +33,9 @@ BEGIN_MESSAGE_MAP(COpenGLstartView, CView)
 END_MESSAGE_MAP()
 
 // COpenGLstartView construction/destruction
-
 COpenGLstartView::COpenGLstartView()
 {
 	// TODO: add construction code here
-
 }
 
 COpenGLstartView::~COpenGLstartView()
@@ -42,8 +45,11 @@ COpenGLstartView::~COpenGLstartView()
 BOOL COpenGLstartView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: Modify the Window class or styles here by modifying
-	//  the CREATESTRUCT cs
 
+	// An OpenGL window must be created with the following flags and must not
+	// include CS_PARENTDC for the class style.
+
+	cs.style |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	return CView::PreCreateWindow(cs);
 }
 
@@ -57,6 +63,29 @@ void COpenGLstartView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: add draw code for native data here
+	CRect clientRect;
+
+	// TODO: add draw code for native data here
+	GetClientRect(&clientRect);
+	glViewport(0, 0, clientRect.right, clientRect.bottom);
+
+	glClearColor(0.5, 0.5, 0.75, 1.0);	// цвет фона
+	glClear(GL_COLOR_BUFFER_BIT);	// очистка буфера цвета
+
+	glPointSize(30);			// размер точек
+	glColor3f(1.0, 0.0, 0.5);		// текущий цвет примитивов
+
+	glBegin(GL_POINTS);
+		glVertex2f(-1, -1);
+		glVertex2f(-1, 1);
+		glVertex2f(0, 0);
+		glVertex2f(1, -1);
+		glVertex2f(1, 1);
+	glEnd();
+
+	glFinish();
+	// Быстро скопировать содержимое заднего буфера окна в передний буфер
+	SwapBuffers(wglGetCurrentDC());
 }
 
 
@@ -82,14 +111,35 @@ COpenGLstartDoc* COpenGLstartView::GetDocument() const // non-debug version is i
 
 
 // COpenGLstartView message handlers
-
-
 int COpenGLstartView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	
+	PIXELFORMATDESCRIPTOR pfd;
+	int iPixelFormat;
+	CDC *pDC;
+
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
-	// TODO:  Add your specialized creation code here
+	
+	// TODO: Add your specialized creation code here
+	pDC = GetDC();
+	
+	memset(&pfd, 0, sizeof(pfd));
+	
+	pfd.nSize = sizeof(pfd);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+	pfd.cDepthBits = 16;
+	
+	iPixelFormat = ChoosePixelFormat(pDC->m_hDC, &pfd);	
+	SetPixelFormat(pDC->m_hDC, iPixelFormat, &pfd);
+	
+	m_hglrc = wglCreateContext(pDC->m_hDC);
+	
+	wglMakeCurrent(pDC->m_hDC, m_hglrc);
+	ReleaseDC(pDC);
 
 	return 0;
 }
@@ -100,6 +150,7 @@ void COpenGLstartView::OnDestroy()
 	CView::OnDestroy();
 
 	// TODO: Add your message handler code here
+	wglMakeCurrent(NULL, NULL);
 }
 
 
